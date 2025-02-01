@@ -4,6 +4,10 @@ authors = []
 description = ""
 telemetry = false
 requirements = []
+[contracts.achievement-badges]
+path = "contracts/achievement-badges.clar"
+depends_on = []
+
 [contracts.arc-tide-core]
 path = "contracts/arc-tide-core.clar"
 depends_on = []
