@@ -18,3 +18,45 @@ Clarinet.test({
     assertEquals(block.receipts[0].result.expectOk(), "u0");
   },
 });
+
+Clarinet.test({
+  name: "Cannot create goal with past deadline",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const wallet_1 = accounts.get("wallet_1")!;
+    const block = chain.mineBlock([
+      Tx.contractCall(
+        "arc-tide-core",
+        "create-goal",
+        [types.utf8("Invalid Goal"), types.uint(1)],
+        wallet_1.address
+      ),
+    ]);
+    assertEquals(block.receipts[0].result.expectErr(), "u101");
+  },
+});
+
+Clarinet.test({
+  name: "Can complete goal before deadline",
+  async fn(chain: Chain, accounts: Map<string, Account>) {
+    const wallet_1 = accounts.get("wallet_1")!;
+    let block = chain.mineBlock([
+      Tx.contractCall(
+        "arc-tide-core",
+        "create-goal",
+        [types.utf8("Test Goal"), types.uint(9999999999)],
+        wallet_1.address
+      ),
+    ]);
+    
+    block = chain.mineBlock([
+      Tx.contractCall(
+        "arc-tide-core",
+        "complete-goal",
+        [types.uint(0)],
+        wallet_1.address
+      ),
+    ]);
+    
+    assertEquals(block.receipts[0].result.expectOk(), "true");
+  },
+});
